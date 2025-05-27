@@ -1,9 +1,21 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import TelaSplash from "./src/screens/TelaSplash";
+import TelaLogin from "./src/screens/TelaLogin";
+import TelaCadastro from "./src/screens/TelaCadastro";
+import TelaInicial from "./src/screens/TelaInicial";
+import TelaAlertas from "./src/screens/TelaAlertas";
+import TelaAbrigos from "./src/screens/TelaAbrigos";
+import TelaPerfil from "./src/screens/TelaPerfil";
+import TelaRelatoEvento from "./src/screens/TelaRelatoEvento";
 
 SplashScreen.preventAutoHideAsync();
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -29,23 +41,23 @@ export default function App() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null; 
+    return null;
   }
 
   return (
-    <View
-      onLayout={onLayoutRootView}
-      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-    >
-      <Text style={{ fontFamily: "OpenSans-Bold", fontSize: 28, marginBottom: 12 }}>
-        Eventus App
-      </Text>
-      <Text style={{ fontFamily: "OpenSans-Regular", fontSize: 18, marginBottom: 6 }}>
-        Bem vindo ao seu projeto!
-      </Text>
-      <Text style={{ fontFamily: "OpenSans-Italic", fontSize: 16, color: "#555" }}>
-        Segurança e prevenção em eventos climáticos extremos.
-      </Text>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="TelaSplash" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="TelaSplash" component={TelaSplash} />
+          <Stack.Screen name="Login" component={TelaLogin} />
+          <Stack.Screen name="Cadastro" component={TelaCadastro} />
+          <Stack.Screen name="Inicial" component={TelaInicial} />
+          <Stack.Screen name="Alertas" component={TelaAlertas} />
+          <Stack.Screen name="Abrigos" component={TelaAbrigos} />
+          <Stack.Screen name="Perfil" component={TelaPerfil} />
+          <Stack.Screen name="RelatoEvento" component={TelaRelatoEvento} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }
