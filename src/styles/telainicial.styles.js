@@ -5,7 +5,7 @@ const { height } = Dimensions.get("window");
 export default StyleSheet.create({
   tela: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FCFCF7",
     justifyContent: "center",
   },
   central: {
