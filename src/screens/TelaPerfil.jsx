@@ -6,6 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/telaperfil.styles";
 import { buscarUsuarioPorId, atualizarUsuario, deletarUsuario } from "../services/usuarioService";
+import { LinearGradient } from "expo-linear-gradient";
 
 function dataBRparaISO(data) {
   const [dia, mes, ano] = data.split("/");
@@ -153,14 +154,38 @@ export default function TelaPerfil({ navigation }) {
               </TouchableOpacity>
             )}
           </View>
-          <TouchableOpacity style={styles.button} onPress={editando ? salvar : () => setEditando(true)} activeOpacity={0.86}>
-            <Text style={styles.buttonText}>{editando ? "Salvar" : "Editar Informações"}</Text>
-          </TouchableOpacity>
+          <LinearGradient
+        colors={["#78f6ff", "#2294f3"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.button, { borderRadius: 12, paddingVertical: 14 }]} // igual input
+      >
+        <TouchableOpacity
+          style={{ width: "100%", alignItems: "center", justifyContent: "center" }}
+          onPress={editando ? salvar : () => setEditando(true)}
+          activeOpacity={0.86}
+        >
+          <Text style={styles.buttonText}>{editando ? "Salvar" : "Editar Informações"}</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+
+
           <View style={{ height: 18 }} />
-          <TouchableOpacity style={styles.btnExcluir} onPress={deslogar}>
-            <Feather name="log-out" size={18} color="#fff" />
-            <Text style={styles.txtExcluir}>Sair da Conta</Text>
-          </TouchableOpacity>
+          <LinearGradient
+            colors={["#fd556a", "#c90a25"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.button, { borderRadius: 12, marginTop: 22 }]}
+          >
+            <TouchableOpacity
+              style={{ width: "100%", alignItems: "center", justifyContent: "center", flexDirection: "row" }}
+              onPress={deslogar}
+              activeOpacity={0.86}
+            >
+              <Feather name="log-out" size={18} color="#fff" />
+              <Text style={[styles.buttonText, { marginLeft: 8 }]}>Sair da Conta</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
         <Navbar navigation={navigation} />
         <View style={styles.areaBrancaAbaixoNavbar} />
