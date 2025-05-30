@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import Navbar from "../components/Navbar";
 import styles from "../styles/telaalertas.styles";
+import { buscarUsuarioPorId } from "../services/usuarioService";
 
 const OPENWEATHER_API_KEY = "8470bcdb745e2c083de3821cf437c091";
-const API_URL = "http://192.168.15.5:5000/api";
 
 export default function TelaAlertas({ navigation }) {
   const [alertas, setAlertas] = useState([]);
@@ -18,12 +18,14 @@ export default function TelaAlertas({ navigation }) {
     try {
       const usuarioId = await AsyncStorage.getItem("usuarioId");
       if (!usuarioId) throw new Error("ID do usuário não encontrado");
-      const res = await axios.get(`${API_URL}/usuarios/${usuarioId}`);
-      const cep = (res.data.cep || "").replace(/\D/g, "").slice(0,8);
+
+      const res = await buscarUsuarioPorId(usuarioId);
+      const cep = (res.data.cep || "").replace(/\D/g, "").slice(0, 8);
       if (!cep) throw new Error("CEP não encontrado para o usuário");
-      const viaCep = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-      const cidade = viaCep.data.localidade;
-      const uf = viaCep.data.uf;
+
+      const viaCepRes = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      const cidade = viaCepRes.data.localidade;
+      const uf = viaCepRes.data.uf;
       if (!cidade || !uf) throw new Error("Cidade ou UF não encontrada pelo CEP");
 
       const climaRes = await axios.get(
@@ -32,10 +34,11 @@ export default function TelaAlertas({ navigation }) {
       const clima = climaRes.data;
       const main = clima.weather[0]?.main.toLowerCase();
       const temp = clima.main.temp;
-      const lista = [];
+
+      const listaAlertas = [];
 
       if (main.includes("rain") || main.includes("chuva")) {
-        lista.push({
+        listaAlertas.push({
           tipo: "Chuva Forte",
           icone: "cloud-rain",
           cor: "#2584E8",
@@ -44,7 +47,7 @@ export default function TelaAlertas({ navigation }) {
         });
       }
       if (main.includes("storm") || main.includes("tempestade")) {
-        lista.push({
+        listaAlertas.push({
           tipo: "Tempestade",
           icone: "cloud-lightning",
           cor: "#f54e42",
@@ -53,7 +56,7 @@ export default function TelaAlertas({ navigation }) {
         });
       }
       if (temp >= 32) {
-        lista.push({
+        listaAlertas.push({
           tipo: "Onda de Calor",
           icone: "sun",
           cor: "#F7B731",
@@ -62,7 +65,7 @@ export default function TelaAlertas({ navigation }) {
         });
       }
       if (temp <= 14) {
-        lista.push({
+        listaAlertas.push({
           tipo: "Frio Intenso",
           icone: "cloud-snow",
           cor: "#00BFFF",
@@ -72,8 +75,8 @@ export default function TelaAlertas({ navigation }) {
       }
 
       setAlertas(
-        lista.length > 0
-          ? lista
+        listaAlertas.length > 0
+          ? listaAlertas
           : [
               {
                 tipo: "Sem Alertas",
@@ -94,6 +97,7 @@ export default function TelaAlertas({ navigation }) {
           detalhe: "Não foi possível obter os alertas.",
         },
       ]);
+      Alert.alert("Erro", e.message || "Erro desconhecido ao obter alertas.");
     }
     setLoading(false);
   }

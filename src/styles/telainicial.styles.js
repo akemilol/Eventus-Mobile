@@ -3,20 +3,20 @@ import { StyleSheet, Dimensions } from "react-native";
 const { height } = Dimensions.get("window");
 
 export default StyleSheet.create({
-tela: {
+  tela: {
     flex: 1,
     backgroundColor: "#fff",
     justifyContent: "center",
-},
-central: {
+  },
+  central: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 18,
     paddingTop: 16,
     paddingBottom: 100,
-},
-cardClima: {
+  },
+  cardClima: {
     width: "100%",
     maxWidth: 380,
     backgroundColor: "#fff",
@@ -30,32 +30,32 @@ cardClima: {
     shadowOpacity: 0.09,
     shadowRadius: 10,
     elevation: 4,
-},
-rowTop: {
+  },
+  rowTop: {
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
     marginBottom: 6,
     alignItems: "center",
-},
-emojiClima: {
+  },
+  emojiClima: {
     fontSize: 38,
     marginLeft: 6,
-},
-localizacao: {
+  },
+  localizacao: {
     fontSize: 18,
     fontFamily: "OpenSans-SemiBold",
     color: "#2584E8",
     marginBottom: 3,
-},
-cepRow: {
+  },
+  cepRow: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
     marginTop: 4,
     marginBottom: 3,
-},
-cepInput: {
+  },
+  cepInput: {
     backgroundColor: "#F4F6FA",
     borderRadius: 8,
     fontSize: 16,
@@ -66,43 +66,43 @@ cepInput: {
     borderColor: "#E1E8F0",
     marginRight: 8,
     fontFamily: "OpenSans-Regular",
-},
-cepSalvar: {
+  },
+  cepSalvar: {
     padding: 4,
     borderRadius: 100,
     backgroundColor: "#F1F7FE",
-},
-cepLabel: {
+  },
+  cepLabel: {
     fontSize: 15,
     color: "#3B9AF2",
     fontFamily: "OpenSans-Regular",
     marginBottom: 6,
     marginTop: 2,
-},
-temp: {
+  },
+  temp: {
     fontSize: 46,
     color: "#222",
     fontFamily: "OpenSans-Bold",
     marginTop: 12,
     marginBottom: 2,
-},
-cond: {
+  },
+  cond: {
     fontSize: 17,
     fontFamily: "OpenSans-SemiBold",
     color: "#2584E8",
     marginBottom: 2,
     textAlign: "center",
-},
-erroMsg: {
+  },
+  erroMsg: {
     color: "#DA2929",
     fontFamily: "OpenSans-SemiBold",
     marginTop: 24,
     fontSize: 16,
-},
-separador: {
+  },
+  separador: {
     height: 8,
-},
-cardDicas: {
+  },
+  cardDicas: {
     width: "100%",
     maxWidth: 380,
     backgroundColor: "#E1F2FE",
@@ -110,25 +110,25 @@ cardDicas: {
     padding: 16,
     marginBottom: 8,
     alignItems: "flex-start",
-},
-dicasTitulo: {
+  },
+  dicasTitulo: {
     fontSize: 16,
     color: "#2584E8",
     fontFamily: "OpenSans-Bold",
     marginBottom: 7,
-},
-dicaItem: {
+  },
+  dicaItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 5,
     marginLeft: 2,
-},
-dicaTxt: {
+  },
+  dicaTxt: {
     fontSize: 15,
     color: "#3B9AF2",
     fontFamily: "OpenSans-Regular",
-},
-cardAlertas: {
+  },
+  cardAlertas: {
     width: "100%",
     maxWidth: 380,
     backgroundColor: "#FEF5E6",
@@ -136,25 +136,25 @@ cardAlertas: {
     padding: 16,
     alignItems: "flex-start",
     marginBottom: 8,
-},
-alertaTitulo: {
+  },
+  alertaTitulo: {
     fontSize: 16,
     color: "#FF9000",
     fontFamily: "OpenSans-Bold",
     marginBottom: 7,
-},
-alertaItem: {
+  },
+  alertaItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 5,
     marginLeft: 2,
-},
-alertaTxt: {
+  },
+  alertaTxt: {
     fontSize: 15,
     color: "#DA8F00",
     fontFamily: "OpenSans-Regular",
-},
-areaBrancaAbaixoNavbar: {
+  },
+  areaBrancaAbaixoNavbar: {
     position: "absolute",
     left: 0,
     right: 0,
@@ -162,5 +162,5 @@ areaBrancaAbaixoNavbar: {
     height: 34,
     backgroundColor: "#fff",
     zIndex: 1,
-},
+  },
 });

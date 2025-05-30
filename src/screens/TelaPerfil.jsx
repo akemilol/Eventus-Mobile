@@ -5,7 +5,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/telaperfil.styles";
-import { buscarUsuarioPorId, atualizarUsuario } from "../services/usuarioService";
+import { buscarUsuarioPorId, atualizarUsuario, deletarUsuario } from "../services/usuarioService";
+
+function dataBRparaISO(data) {
+  const [dia, mes, ano] = data.split("/");
+  if (!dia || !mes || !ano) return "";
+  return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}T00:00:00`;
+}
 
 export default function TelaPerfil({ navigation }) {
   const [editando, setEditando] = useState(false);
@@ -28,9 +34,9 @@ export default function TelaPerfil({ navigation }) {
         setNome(user.nome || "");
         setCpf(user.cpf || "");
         setCep(user.cep || "");
-        setDataNasc(user.dataNascimento ? user.dataNascimento.substring(0, 10) : "");
+        setDataNasc(user.dataNascimento ? user.dataNascimento.substring(0, 10).split("-").reverse().join("/") : "");
         setEmail(user.email || "");
-        setSenha(user.senha || "");
+        setSenha("");
         setFotoUri(await AsyncStorage.getItem(`fotoPerfil_${id}`));
       }
     }
@@ -38,18 +44,30 @@ export default function TelaPerfil({ navigation }) {
   }, []);
 
   async function salvar() {
-    if (usuarioId) {
-      await atualizarUsuario(usuarioId, {
-        nome, cpf, cep, dataNascimento: dataNasc, email, senha
-      });
-      await AsyncStorage.setItem("nome", nome);
-      await AsyncStorage.setItem("cpf", cpf);
-      await AsyncStorage.setItem("cep", cep);
-      await AsyncStorage.setItem("dataNasc", dataNasc);
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("senha", senha);
+    try {
+      if (usuarioId) {
+        const usuarioAtual = await buscarUsuarioPorId(usuarioId);
+        const senhaFinal = senha || usuarioAtual.data.senha || "";
+        await atualizarUsuario(usuarioId, {
+          nome,
+          cpf,
+          cep,
+          dataNascimento: dataBRparaISO(dataNasc),
+          email,
+          senha: senhaFinal
+        });
+        await AsyncStorage.setItem("nome", nome);
+        await AsyncStorage.setItem("cpf", cpf);
+        await AsyncStorage.setItem("cep", cep);
+        await AsyncStorage.setItem("dataNasc", dataNasc);
+        await AsyncStorage.setItem("email", email);
+        await AsyncStorage.setItem("senha", senhaFinal);
+      }
+      setEditando(false);
+      Alert.alert("Sucesso", "Dados editados com sucesso!");
+    } catch (err) {
+      Alert.alert("Erro", err.response?.data?.message || "Não foi possível salvar.");
     }
-    setEditando(false);
   }
 
   async function selecionarFoto() {
@@ -81,6 +99,9 @@ export default function TelaPerfil({ navigation }) {
           text: "Excluir",
           style: "destructive",
           onPress: async () => {
+            if (usuarioId) {
+              await deletarUsuario(usuarioId);
+            }
             await AsyncStorage.clear();
             navigation.reset({
               index: 0,
@@ -90,6 +111,14 @@ export default function TelaPerfil({ navigation }) {
         },
       ]
     );
+  }
+
+  async function deslogar() {
+    await AsyncStorage.clear();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Login" }],
+    });
   }
 
   return (
@@ -117,13 +146,20 @@ export default function TelaPerfil({ navigation }) {
             <TextInput style={styles.input} value={dataNasc} placeholder="data de nascimento" placeholderTextColor="#888" editable={editando} onChangeText={setDataNasc} />
             <TextInput style={styles.input} value={email} placeholder="email" placeholderTextColor="#888" editable={editando} autoCapitalize="none" keyboardType="email-address" onChangeText={setEmail} />
             <TextInput style={styles.input} value={senha} placeholder="senha:" placeholderTextColor="#888" editable={editando} secureTextEntry onChangeText={setSenha} />
+            {editando && (
+              <TouchableOpacity style={styles.inputExcluir} onPress={excluirConta}>
+                <Feather name="trash-2" size={20} color="#fff" />
+                <Text style={styles.txtExcluirInput}>Excluir Conta</Text>
+              </TouchableOpacity>
+            )}
           </View>
           <TouchableOpacity style={styles.button} onPress={editando ? salvar : () => setEditando(true)} activeOpacity={0.86}>
             <Text style={styles.buttonText}>{editando ? "Salvar" : "Editar Informações"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnExcluir} onPress={excluirConta}>
-            <Feather name="trash-2" size={18} color="#fff" />
-            <Text style={styles.txtExcluir}>Excluir Conta</Text>
+          <View style={{ height: 18 }} />
+          <TouchableOpacity style={styles.btnExcluir} onPress={deslogar}>
+            <Feather name="log-out" size={18} color="#fff" />
+            <Text style={styles.txtExcluir}>Sair da Conta</Text>
           </TouchableOpacity>
         </View>
         <Navbar navigation={navigation} />

@@ -21,8 +21,9 @@ function formatDate(value) {
     .slice(0, 10);
 }
 function parseDataISO(dateStr) {
+  if (!dateStr || dateStr.length !== 10) return null;
   const [dia, mes, ano] = dateStr.split('/');
-  if (!dia || !mes || !ano) return null;
+  if (!dia || !mes || !ano || ano.length !== 4) return null;
   return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T00:00:00`;
 }
 
@@ -58,6 +59,11 @@ export default function TelaCadastro({ navigation }) {
       Alert.alert("Data inválida", "Digite a data de nascimento (dd/mm/aaaa).");
       return;
     }
+    const dataNascFormatada = parseDataISO(dataNasc);
+    if (!dataNascFormatada) {
+      Alert.alert("Data inválida", "Digite a data de nascimento corretamente.");
+      return;
+    }
     if (!email || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       Alert.alert("Email inválido", "Digite um email válido.");
       return;
@@ -77,12 +83,14 @@ export default function TelaCadastro({ navigation }) {
         senha,
         cpf: cpf.replace(/\D/g, ""),
         cep: cep.replace(/\D/g, ""),
-        dataNascimento: parseDataISO(dataNasc)
+        dataNascimento: dataNascFormatada
       };
+      console.log("Enviando:", usuario);
       await cadastrarUsuario(usuario);
       Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
       navigation.navigate("Login");
     } catch (error) {
+      console.log("ERRO AO CADASTRAR:", error?.response?.data, error?.response?.status, error);
       if (error.response?.data?.message) {
         Alert.alert("Erro", error.response.data.message);
       } else {

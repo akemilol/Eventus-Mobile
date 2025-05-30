@@ -119,4 +119,21 @@ export default StyleSheet.create({
     backgroundColor: "#fff",
     zIndex: 1,
   },
+  inputExcluir: {
+  flexDirection: "row",
+  alignItems: "center",
+  width: "100%",
+  backgroundColor: "#D83349",
+  borderRadius: 7,
+  paddingHorizontal: 14,
+  paddingVertical: 13,
+  marginBottom: 13,
+  justifyContent: "center",
+},
+txtExcluirInput: {
+  color: "#fff",
+  fontFamily: "OpenSans-SemiBold",
+  fontSize: 15.5,
+  marginLeft: 10,
+},
 });
