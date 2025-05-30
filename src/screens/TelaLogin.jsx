@@ -3,10 +3,14 @@ import { View, TextInput, TouchableOpacity, Text, Alert, KeyboardAvoidingView, P
 import styles from '../styles/telalogin.styles';
 import { loginUsuario } from '../services/usuarioService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
+
 
 export default function TelaLogin({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
 
   async function handleLogin() {
     if (!email || !senha) {
@@ -35,16 +39,33 @@ export default function TelaLogin({ navigation }) {
           autoCapitalize="none"
           keyboardType="email-address"
         />
+        <View style={styles.senhaWrapper}>
         <TextInput
           placeholder="Senha"
-          style={styles.input}
+          style={[styles.input, { marginBottom: 0, paddingRight: 40 }]}
           value={senha}
           onChangeText={setSenha}
-          secureTextEntry
+          secureTextEntry={!showSenha}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity
+          style={styles.olho}
+          onPress={() => setShowSenha(!showSenha)}
+        >
+        <Feather name={showSenha ? "eye" : "eye-off"} size={22} color="#888" />
+        </TouchableOpacity>
+        </View>
+
+        <LinearGradient
+        colors={["#78f6ff", "#2294f3"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.button}
+      >
+        <TouchableOpacity style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
+        </LinearGradient>
+
         <TouchableOpacity style={styles.linkContainer} onPress={() => navigation.navigate('Cadastro')}>
           <Text style={styles.linkText}>Ainda não tem cadastro? Cadastre-se</Text>
         </TouchableOpacity>

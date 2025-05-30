@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Feather } from '@expo/vector-icons';
 import styles from "../styles/telacadastro.styles";
 import { cadastrarUsuario } from "../services/usuarioService";
+import { LinearGradient } from 'expo-linear-gradient';
 
 function formatCPF(value) {
   return value.replace(/\D/g, '')
@@ -175,9 +176,21 @@ export default function TelaCadastro({ navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={validarCampos}>
+          <LinearGradient
+          colors={["#78f6ff", "#2294f3"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.button}
+        >
+          <TouchableOpacity
+            style={{ width: "100%", alignItems: "center", justifyContent: "center" }}
+            activeOpacity={0.8}
+            onPress={validarCampos}
+          >
             <Text style={styles.buttonText}>Cadastrar</Text>
           </TouchableOpacity>
+        </LinearGradient>
+
           <TouchableOpacity style={styles.linkContainer} onPress={() => navigation.navigate("Login")}>
             <Text style={styles.linkText}>Já possui conta? Faça login</Text>
           </TouchableOpacity>
