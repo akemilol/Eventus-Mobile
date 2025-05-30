@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, TextInput, Alert, Image, Platform } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from "expo-image-picker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/telarelatoevento.styles";
+import { enviarRelato } from "../services/relatoService";
 
 const tipos = [
   { label: "Alagamento", value: "alagamento", icon: "droplet" },
@@ -13,43 +13,67 @@ const tipos = [
   { label: "Outro", value: "outro", icon: "edit" },
 ];
 
+function formatDate(value) {
+  return value.replace(/\D/g, '')
+    .replace(/^(\d{2})(\d)/, '$1/$2')
+    .replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3')
+    .slice(0, 10);
+}
+
+function dateToIso(str) {
+  if (!str || str.length < 10) return new Date().toISOString();
+  const [day, month, year] = str.split('/');
+  return new Date(`${year}-${month}-${day}T00:00:00`).toISOString();
+}
+
 export default function TelaRelatoEvento({ navigation }) {
   const [tipo, setTipo] = useState("alagamento");
   const [descricao, setDescricao] = useState("");
-  const [fotoUri, setFotoUri] = useState(null);
   const [cep, setCep] = useState("");
+  const [dataEvento, setDataEvento] = useState("");
 
   useEffect(() => {
-    AsyncStorage.getItem("cep").then(setCep);
+    AsyncStorage.getItem("usuario").then(data => {
+      if (data) {
+        const user = JSON.parse(data);
+        setCep(user.cep || "");
+      }
+    });
+    const hoje = new Date();
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const ano = hoje.getFullYear();
+    setDataEvento(`${dia}/${mes}/${ano}`);
   }, []);
 
-  async function selecionarFoto() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Permita acesso à galeria.");
-      return;
-    }
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.6,
-      aspect: [1, 1],
-    });
-    if (!result.canceled) {
-      setFotoUri(result.assets[0].uri);
-    }
-  }
-
-  async function enviarRelato() {
+  async function enviarRelatoEvento() {
     if (!descricao.trim()) {
       Alert.alert("Descreva o evento!");
       return;
     }
-    Alert.alert("Relato enviado!", "Obrigado pela colaboração.");
-    setDescricao("");
-    setFotoUri(null);
-    setTipo("alagamento");
-    navigation.goBack();
+    if (!cep || cep.length < 8) {
+      Alert.alert("CEP inválido", "Digite um CEP válido.");
+      return;
+    }
+    if (!dataEvento || dataEvento.length < 10) {
+      Alert.alert("Data inválida", "Digite a data no formato DD/MM/AAAA.");
+      return;
+    }
+    try {
+      const usuarioId = await AsyncStorage.getItem("usuarioId");
+      await enviarRelato({
+        descricao: `[${tipo}] ${descricao}`,
+        localizacao: cep,
+        usuarioId: Number(usuarioId),
+        dataEvento: dateToIso(dataEvento)
+      });
+      Alert.alert("Relato enviado!", "Obrigado pela colaboração.");
+      setDescricao("");
+      setTipo("alagamento");
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert("Erro", "Não foi possível enviar o relato.");
+    }
   }
 
   return (
@@ -88,17 +112,23 @@ export default function TelaRelatoEvento({ navigation }) {
           />
           <Text style={styles.label}>Local (CEP):</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: "#f0f3f9" }]}
+            style={styles.input}
+            placeholder="CEP do evento"
             value={cep}
-            editable={false}
+            onChangeText={setCep}
+            keyboardType="numeric"
+            maxLength={8}
           />
-          <Text style={styles.label}>Foto (opcional):</Text>
-          <TouchableOpacity style={styles.fotoBtn} onPress={selecionarFoto}>
-            <Feather name="camera" size={22} color="#2584E8" />
-            <Text style={styles.fotoBtnTxt}>Selecionar Foto</Text>
-          </TouchableOpacity>
-          {fotoUri && <Image source={{ uri: fotoUri }} style={styles.fotoPreview} />}
-          <TouchableOpacity style={styles.button} onPress={enviarRelato}>
+          <Text style={styles.label}>Data do evento:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="DD/MM/AAAA"
+            value={dataEvento}
+            onChangeText={text => setDataEvento(formatDate(text))}
+            keyboardType="numeric"
+            maxLength={10}
+          />
+          <TouchableOpacity style={styles.button} onPress={enviarRelatoEvento}>
             <Text style={styles.buttonText}>Enviar Relato</Text>
           </TouchableOpacity>
         </View>

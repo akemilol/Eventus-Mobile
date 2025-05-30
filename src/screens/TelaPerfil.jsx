@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/telaperfil.styles";
+import { buscarUsuarioPorId, atualizarUsuario } from "../services/usuarioService";
 
 export default function TelaPerfil({ navigation }) {
   const [editando, setEditando] = useState(false);
@@ -15,27 +16,39 @@ export default function TelaPerfil({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [fotoUri, setFotoUri] = useState(null);
+  const [usuarioId, setUsuarioId] = useState("");
 
   useEffect(() => {
     async function fetchData() {
-      setNome((await AsyncStorage.getItem("nome")) || "Nome do usuário");
-      setCpf((await AsyncStorage.getItem("cpf")) || "");
-      setCep((await AsyncStorage.getItem("cep")) || "");
-      setDataNasc((await AsyncStorage.getItem("dataNasc")) || "");
-      setEmail((await AsyncStorage.getItem("email")) || "");
-      setSenha((await AsyncStorage.getItem("senha")) || "");
-      setFotoUri(await AsyncStorage.getItem("fotoPerfil"));
+      const id = await AsyncStorage.getItem("usuarioId");
+      setUsuarioId(id);
+      if (id) {
+        const response = await buscarUsuarioPorId(id);
+        const user = response.data;
+        setNome(user.nome || "");
+        setCpf(user.cpf || "");
+        setCep(user.cep || "");
+        setDataNasc(user.dataNascimento ? user.dataNascimento.substring(0, 10) : "");
+        setEmail(user.email || "");
+        setSenha(user.senha || "");
+        setFotoUri(await AsyncStorage.getItem(`fotoPerfil_${id}`));
+      }
     }
     fetchData();
   }, []);
 
   async function salvar() {
-    await AsyncStorage.setItem("nome", nome);
-    await AsyncStorage.setItem("cpf", cpf);
-    await AsyncStorage.setItem("cep", cep);
-    await AsyncStorage.setItem("dataNasc", dataNasc);
-    await AsyncStorage.setItem("email", email);
-    await AsyncStorage.setItem("senha", senha);
+    if (usuarioId) {
+      await atualizarUsuario(usuarioId, {
+        nome, cpf, cep, dataNascimento: dataNasc, email, senha
+      });
+      await AsyncStorage.setItem("nome", nome);
+      await AsyncStorage.setItem("cpf", cpf);
+      await AsyncStorage.setItem("cep", cep);
+      await AsyncStorage.setItem("dataNasc", dataNasc);
+      await AsyncStorage.setItem("email", email);
+      await AsyncStorage.setItem("senha", senha);
+    }
     setEditando(false);
   }
 
@@ -54,7 +67,7 @@ export default function TelaPerfil({ navigation }) {
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       setFotoUri(uri);
-      await AsyncStorage.setItem("fotoPerfil", uri);
+      if (usuarioId) await AsyncStorage.setItem(`fotoPerfil_${usuarioId}`, uri);
     }
   }
 
@@ -99,55 +112,13 @@ export default function TelaPerfil({ navigation }) {
           </TouchableOpacity>
           <Text style={styles.nome}>{nome}</Text>
           <View style={styles.form}>
-            <TextInput
-              style={styles.input}
-              value={cpf}
-              placeholder="cpf"
-              placeholderTextColor="#888"
-              editable={editando}
-              onChangeText={setCpf}
-            />
-            <TextInput
-              style={styles.input}
-              value={cep}
-              placeholder="cep"
-              placeholderTextColor="#888"
-              editable={editando}
-              onChangeText={setCep}
-            />
-            <TextInput
-              style={styles.input}
-              value={dataNasc}
-              placeholder="data de nascimento"
-              placeholderTextColor="#888"
-              editable={editando}
-              onChangeText={setDataNasc}
-            />
-            <TextInput
-              style={styles.input}
-              value={email}
-              placeholder="email"
-              placeholderTextColor="#888"
-              editable={editando}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              onChangeText={setEmail}
-            />
-            <TextInput
-              style={styles.input}
-              value={senha}
-              placeholder="senha:"
-              placeholderTextColor="#888"
-              editable={editando}
-              secureTextEntry
-              onChangeText={setSenha}
-            />
+            <TextInput style={styles.input} value={cpf} placeholder="cpf" placeholderTextColor="#888" editable={editando} onChangeText={setCpf} />
+            <TextInput style={styles.input} value={cep} placeholder="cep" placeholderTextColor="#888" editable={editando} onChangeText={setCep} />
+            <TextInput style={styles.input} value={dataNasc} placeholder="data de nascimento" placeholderTextColor="#888" editable={editando} onChangeText={setDataNasc} />
+            <TextInput style={styles.input} value={email} placeholder="email" placeholderTextColor="#888" editable={editando} autoCapitalize="none" keyboardType="email-address" onChangeText={setEmail} />
+            <TextInput style={styles.input} value={senha} placeholder="senha:" placeholderTextColor="#888" editable={editando} secureTextEntry onChangeText={setSenha} />
           </View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={editando ? salvar : () => setEditando(true)}
-            activeOpacity={0.86}
-          >
+          <TouchableOpacity style={styles.button} onPress={editando ? salvar : () => setEditando(true)} activeOpacity={0.86}>
             <Text style={styles.buttonText}>{editando ? "Salvar" : "Editar Informações"}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btnExcluir} onPress={excluirConta}>

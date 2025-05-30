@@ -1,8 +1,8 @@
-import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
+import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from '@expo/vector-icons';
 import styles from "../styles/telacadastro.styles";
+import { cadastrarUsuario } from "../services/usuarioService";
 
 function formatCPF(value) {
   return value.replace(/\D/g, '')
@@ -19,6 +19,11 @@ function formatDate(value) {
     .replace(/^(\d{2})(\d)/, '$1/$2')
     .replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3')
     .slice(0, 10);
+}
+function parseDataISO(dateStr) {
+  const [dia, mes, ano] = dateStr.split('/');
+  if (!dia || !mes || !ano) return null;
+  return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T00:00:00`;
 }
 
 export default function TelaCadastro({ navigation }) {
@@ -65,9 +70,25 @@ export default function TelaCadastro({ navigation }) {
       Alert.alert("Senhas diferentes", "As senhas não coincidem.");
       return;
     }
-    await AsyncStorage.setItem("cep", cep.replace(/\D/g, ""));
-    await AsyncStorage.setItem("nome", nome.trim());
-    navigation.navigate("Inicial");
+    try {
+      const usuario = {
+        nome: nome.trim(),
+        email,
+        senha,
+        cpf: cpf.replace(/\D/g, ""),
+        cep: cep.replace(/\D/g, ""),
+        dataNascimento: parseDataISO(dataNasc)
+      };
+      await cadastrarUsuario(usuario);
+      Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
+      navigation.navigate("Login");
+    } catch (error) {
+      if (error.response?.data?.message) {
+        Alert.alert("Erro", error.response.data.message);
+      } else {
+        Alert.alert("Erro", "Não foi possível cadastrar. Tente novamente.");
+      }
+    }
   }
 
   return (
@@ -147,7 +168,7 @@ export default function TelaCadastro({ navigation }) {
             </View>
           </View>
           <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={validarCampos}>
-            <Text style={styles.buttonText}>Acessar</Text>
+            <Text style={styles.buttonText}>Cadastrar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.linkContainer} onPress={() => navigation.navigate("Login")}>
             <Text style={styles.linkText}>Já possui conta? Faça login</Text>

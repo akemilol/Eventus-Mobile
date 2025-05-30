@@ -1,44 +1,52 @@
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
-import { useState } from "react";
-import { Feather } from "@expo/vector-icons";
-import styles from "../styles/telalogin.styles";
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, Text, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import styles from '../styles/telalogin.styles';
+import { loginUsuario } from '../services/usuarioService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TelaLogin({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [showSenha, setShowSenha] = useState(false);
+
+  async function handleLogin() {
+    if (!email || !senha) {
+      Alert.alert('Atenção', 'Preencha e-mail e senha.');
+      return;
+    }
+    try {
+      const response = await loginUsuario({ email, senha });
+      await AsyncStorage.setItem("usuarioId", String(response.data.id));
+      Alert.alert('Sucesso', 'Login realizado!');
+      navigation.navigate('Inicial'); 
+    } catch (error) {
+      Alert.alert('Erro', error.response?.data?.message || 'E-mail ou senha incorretos.');
+    }
+  }
 
   return (
-    <KeyboardAvoidingView style={styles.keyboard} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
         <TextInput
-          placeholder="Email:"
-          placeholderTextColor="#A6A6A6"
+          placeholder="E-mail"
           style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
-        <View style={styles.senhaWrapper}>
-          <TextInput
-            placeholder="Senha:"
-            placeholderTextColor="#A6A6A6"
-            style={[styles.input, { marginBottom: 0, paddingRight: 40 }]}
-            secureTextEntry={!showSenha}
-            value={senha}
-            onChangeText={setSenha}
-          />
-          <TouchableOpacity style={styles.olho} onPress={() => setShowSenha(!showSenha)}>
-            <Feather name={showSenha ? "eye" : "eye-off"} size={22} color="#888" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.button} activeOpacity={0.85} onPress={() => navigation.navigate("Inicial")}>
-          <Text style={styles.buttonText}>Acessar</Text>
+        <TextInput
+          placeholder="Senha"
+          style={styles.input}
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Cadastro")}>
-          <Text style={styles.linkText}>Não possui conta? <Text style={styles.linkTextBold}>Cadastre-se</Text></Text>
+        <TouchableOpacity style={styles.linkContainer} onPress={() => navigation.navigate('Cadastro')}>
+          <Text style={styles.linkText}>Ainda não tem cadastro? Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

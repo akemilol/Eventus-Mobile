@@ -4,7 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import Navbar from "../components/Navbar";
-import styles from "../styles/telainicial.styles"; 
+import styles from "../styles/telainicial.styles";
+import { buscarUsuarioPorId, atualizarUsuario } from "../services/usuarioService";
 
 const OPENWEATHER_API_KEY = "8470bcdb745e2c083de3821cf437c091";
 
@@ -21,12 +22,18 @@ export default function TelaInicial({ navigation }) {
   async function carregarDados() {
     setLoading(true);
     try {
-      const savedCep = await AsyncStorage.getItem("cep");
-      const savedNome = await AsyncStorage.getItem("nome");
-      const cepLimpo = (savedCep || "").replace(/\D/g, "").slice(0, 8);
+      const usuarioId = await AsyncStorage.getItem("usuarioId");
+      if (!usuarioId) {
+        setLoading(false);
+        return;
+      }
+      const response = await buscarUsuarioPorId(usuarioId);
+      const user = response.data;
+      const cepLimpo = (user.cep || "").replace(/\D/g, "").slice(0, 8);
       setCep(cepLimpo);
       setNovoCep(cepLimpo);
-      setNome(savedNome || "");
+      setNome(user.nome || "");
+
       if (!cepLimpo) {
         setLoading(false);
         return;
@@ -34,6 +41,7 @@ export default function TelaInicial({ navigation }) {
       const viaCep = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`);
       setCidade(viaCep.data.localidade);
       setUf(viaCep.data.uf);
+
       try {
         const climaRes = await axios.get(
           `https://api.openweathermap.org/data/2.5/weather?q=${viaCep.data.localidade},${viaCep.data.uf},BR&appid=${OPENWEATHER_API_KEY}&lang=pt_br&units=metric`
@@ -49,10 +57,17 @@ export default function TelaInicial({ navigation }) {
   }
 
   async function salvarCep(novo) {
-    await AsyncStorage.setItem("cep", novo);
     setCep(novo);
     setEditandoCep(false);
     Keyboard.dismiss();
+
+    const usuarioId = await AsyncStorage.getItem("usuarioId");
+    const response = await buscarUsuarioPorId(usuarioId);
+    const usuario = response.data;
+    usuario.cep = novo;
+    await atualizarUsuario(usuarioId, usuario);
+
+    await AsyncStorage.setItem("cep", novo);
     carregarDados();
   }
 
@@ -64,7 +79,6 @@ export default function TelaInicial({ navigation }) {
     if (!clima) return [];
     const main = clima.weather[0]?.main.toLowerCase();
     const temp = clima.main.temp;
-
     if (main.includes("rain") || main.includes("chuva")) {
       return [
         "🌧️ Leve guarda-chuva!",
