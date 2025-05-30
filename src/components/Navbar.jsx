@@ -1,16 +1,39 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import styles from "../styles/navbar.styles"; 
 
-export default function Navbar({ navigation }) {
+export default function Navbar() {
+  const route = useRoute();
+  const navigation = useNavigation();
+
   return (
     <View style={styles.navbar}>
       <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Inicial")}>
-        <Feather name="home" size={26} color="#2584E8" />
-        <Text style={styles.navLabel}>Início</Text>
+        <Feather
+          name="home"
+          size={26}
+          color={route.name === "Inicial" ? "#2294f3" : "#A6A6A6"}
+        />
+        <Text style={[
+          styles.navLabel,
+          route.name === "Inicial" && { color: "#2294f3", fontWeight: "bold" }
+        ]}>
+          Início
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Alertas")}>
-        <Feather name="alert-circle" size={26} color="#A6A6A6" />
-        <Text style={styles.navLabel}>Alertas</Text>
+        <Feather
+          name="alert-circle"
+          size={26}
+          color={route.name === "Alertas" ? "#d13824" : "#A6A6A6"}
+        />
+        <Text style={[
+          styles.navLabel,
+          route.name === "Alertas" && { color: "#2294f3", fontWeight: "bold" }
+        ]}>
+          Alertas
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navAdd}
@@ -19,59 +42,31 @@ export default function Navbar({ navigation }) {
         <Feather name="plus-circle" size={34} color="#fff" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Abrigos")}>
-        <Feather name="map-pin" size={26} color="#A6A6A6" />
-        <Text style={styles.navLabel}>Abrigos</Text>
+        <Feather
+          name="map-pin"
+          size={26}
+          color={route.name === "Abrigos" ? "#6acf80" : "#A6A6A6"}
+        />
+        <Text style={[
+          styles.navLabel,
+          route.name === "Abrigos" && { color: "#2294f3", fontWeight: "bold" }
+        ]}>
+          Abrigos
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Perfil")}>
-        <Feather name="user" size={26} color="#2584E8" />
-        <Text style={[styles.navLabel, { color: "#2584E8", fontWeight: "bold" }]}>Perfil</Text>
+        <Feather
+          name="user"
+          size={26}
+          color={route.name === "Perfil" ? "#d1a104" : "#A6A6A6"}
+        />
+        <Text style={[
+          styles.navLabel,
+          route.name === "Perfil" && { color: "#2294f3", fontWeight: "bold" }
+        ]}>
+          Perfil
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  navbar: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 24,
-    width: "100%",
-    height: 70,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    elevation: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.09,
-    shadowOffset: { width: 0, height: -2 },
-    shadowRadius: 10,
-    borderTopWidth: 1,
-    borderColor: "#e6e6e6"
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navAdd: {
-    width: 56,
-    height: 56,
-    backgroundColor: "#3B9AF2",
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    bottom: 16,
-    zIndex: 2,
-  },
-  navLabel: {
-    fontSize: 12,
-    color: "#2584E8",
-    fontFamily: "OpenSans-SemiBold",
-    marginTop: 1,
-  },
-});
