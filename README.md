@@ -11,7 +11,7 @@ O **Eventus** é um sistema para monitoramento, detecção e alerta de eventos e
 ## 🔗 Links Importantes
 
 - ☁️ [Repositório do Backend (API .NET)](https://github.com/akemilol/Eventus.API-Csharp)
-- 🎥 [Vídeo de Demonstração do app]()
+- 🎥 [Vídeo de Demonstração do app](https://youtu.be/l2vGGFyoYCg)
 
 ---
 
