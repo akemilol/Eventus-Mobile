@@ -93,7 +93,6 @@ export default function TelaInicial({ navigation }) {
       carregarDados();
       Alert.alert("Sucesso", "CEP atualizado com sucesso!");
     } catch (err) {
-      console.log("Erro no PUT atualizarUsuario:", err.response?.data || err.message);
       Alert.alert("Erro", err.response?.data?.message || "Não foi possível atualizar o CEP.");
     }
   }
