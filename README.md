@@ -19,8 +19,8 @@ O **Eventus** é um sistema para monitoramento, detecção e alerta de eventos e
 ## 🔄 Integração com a API
 
 - Utiliza `Axios` para operações CRUD (criar, listar, editar, excluir relatos)
-- Consome API desenvolvida nas disciplinas de C# .net 8
-- Todos os dados armazenados no backend junto com Oracle sql developerd
+- Consome API desenvolvida na disciplina de C# .net 8
+- Todos os dados armazenados no backend junto com Oracle sql developer
 
 ---
 
