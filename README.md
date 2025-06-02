@@ -11,7 +11,7 @@ O **Eventus** é um sistema para monitoramento, detecção e alerta de eventos e
 ## 🔗 Links Importantes
 
 - ☁️ [Repositório do Backend (API .NET)](https://github.com/akemilol/Eventus.API-Csharp)
-- 🎥 [Vídeo de Demonstração do app](COLOQUE O LINK AQUI)
+- 🎥 [Vídeo de Demonstração do app]()
 
 ---
 
@@ -33,13 +33,13 @@ O **Eventus** é um sistema para monitoramento, detecção e alerta de eventos e
 
 ## 🛠️ Como Rodar o Projeto
 
-# 1. Instale as dependências
+### 1. Instale as dependências
 npm install
 
-# 2. Rode o projeto em modo desenvolvimento
+### 2. Rode o projeto
 npm start
 
-# 3. Configure o .env para apontar para a API backend
+### 3. Configure o .env para apontar para a API backend
 
 ---
 
